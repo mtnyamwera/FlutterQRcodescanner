@@ -1,0 +1,119 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:barcode_scan2/barcode_scan2.dart';
+
+class Scanmerchantqrcode extends StatefulWidget {     
+ Scanmerchantqrcode({Key? key}) : super(key: key);
+  
+     @override
+      State<Scanmerchantqrcode> createState(){
+        return Scanmerchantqrcodestate();
+      } 
+       
+}
+
+String amounttosend="";
+String merchantnumber="";
+String scannedCode = "";
+
+
+class Scanmerchantqrcodestate extends State<Scanmerchantqrcode>{
+
+final TextEditingController textFieldController = TextEditingController();
+
+
+Scanmerchantqrcode selectedTextWidget =Scanmerchantqrcode();
+
+  @override
+  void initState() {
+    super.initState();
+   
+  }
+
+
+
+@override
+Widget build(BuildContext context) {
+     
+return Scaffold(
+ 
+      appBar: AppBar(
+     
+         leading: BackButton(         
+          onPressed: () => Navigator.pushNamed(context, '/dashboards',),  
+        ), 
+        title: const Text("Scan To Pay Merchant",style: TextStyle(fontSize: 15,fontFamily: 'Ubuntu',)),
+      ),
+      body: 
+      ListView(
+        children:   <Widget>[
+        ListTile(
+           title: Row(
+          children: <Widget>[
+          const Expanded(
+            flex: 3,
+            child: Text('Merchant ID',textAlign: TextAlign.left, style: TextStyle(fontSize: 15.0)), // First column with an icon
+            ),
+          Expanded(
+        flex: 3,
+        child: Text(merchantnumber,textAlign: TextAlign.right,style: TextStyle(fontSize: 15.0)), // Second column with text
+          ),
+        ],
+          ),
+      ),
+       Divider(),
+      ListTile(
+           title: Row(
+          children: <Widget>[
+          const Expanded(
+            flex: 4,
+            child: Text('Total for Items',textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0)), // First column with an icon
+            ),
+          Expanded(
+        flex: 2,
+        child: Text('US$amounttosend',textAlign: TextAlign.right,style: TextStyle(fontSize: 15.0)), // Second column with text
+          ),
+        ],
+          ),
+        ),
+         Divider(),
+    ListTile(
+     title: Row(
+      children: <Widget>[
+    Expanded(
+       child: ElevatedButton(
+        onPressed: () async {
+
+        try{
+        ScanResult barcode = await BarcodeScanner.scan(); 
+        setState(() {
+        scannedCode = barcode.rawContent;
+        // Parse the string into a Map (Dart object)
+        Map<String, dynamic> jsonMap = json.decode(scannedCode);
+        merchantnumber = jsonMap['agentId'];
+        amounttosend = jsonMap['amount'];
+        });        
+        } catch (e) {
+           print("Error scanning barcode: $e");
+           merchantnumber = ""; 
+           amounttosend = ""; 
+      }
+
+        },
+        child: const Text('Scan the QR Code'),
+          ),         
+          
+          ),
+        ],
+          ),
+      ),          
+        ],
+      ),
+                          
+
+    ); 
+
+}
+
+
+}
